@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import Home from './pages/Home';
 import Dictionary from './pages/Dictionary';
@@ -11,6 +11,8 @@ import './App.css';
 
 function App() {
   const basePath = import.meta.env.VITE_BASE_PATH ? `/${import.meta.env.VITE_BASE_PATH.replace(/^\/+|\/+$/g,'')}` : '';
+  // Диагностика (можно удалить позже)
+  console.log('Router basename =', basePath);
   return (
     <AuthProvider>
       <Router basename={basePath}>
@@ -22,6 +24,8 @@ function App() {
             <Route path="/add-word" element={<AddWord />} />
             <Route path="/search" element={<Search />} />
             <Route path="/login" element={<Login />} />
+            {/* Fallback: перенаправление на корень */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </Router>
