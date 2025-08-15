@@ -50,6 +50,7 @@ services:
     environment:
       - VITE_API_BASE_URL=https://lopata.su
       - VITE_API_VERSION=v1.1.1
+      - VITE_BASE_PATH=uga-buga_dictionary
     ports:
       - "3000:80"
     networks:

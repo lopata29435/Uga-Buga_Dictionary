@@ -1,10 +1,11 @@
 import React from 'react';
 
 const ProfileSection = ({ name, subtitle }) => {
+  const imgSrc = `${import.meta.env.BASE_URL}profile.jpg`;
   return (
     <div className="profile-section">
       <img
-        src="/profile.jpg"
+        src={imgSrc}
         alt="Главный Вахтанг"
         className="profile-image"
       />
