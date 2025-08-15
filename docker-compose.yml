@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: dictionary_postgres
+    environment:
+      POSTGRES_DB: dictionary_db
+      POSTGRES_USER: dictionary_user
+      POSTGRES_PASSWORD: dictionary_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - dictionary_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dictionary_user -d dictionary_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  dictionary-app:
+    build: .
+    container_name: dictionary_app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/dictionary_db
+      - SPRING_DATASOURCE_USERNAME=dictionary_user
+      - SPRING_DATASOURCE_PASSWORD=dictionary_password
+      - JWT_SECRET=tolsty:tolsty:tolsty:tolsty:tolsty:tolsty
+      - JWT_ACCESS_EXPIRY=600000
+      - JWT_REFRESH_EXPIRY=604800000
+      - API_VERSION=v1.1.1
+    ports:
+      - "8080:8080"
+    networks:
+      - dictionary_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  dictionary_network:
+    driver: bridge
