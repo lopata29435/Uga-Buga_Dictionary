@@ -60,6 +60,12 @@ public class SecurityConfig {
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 
+    @PostConstruct
+    public void logApiVersion() {
+        System.out.println("=== API VERSION IN SECURITY CONFIG: " + apiVersion + " ===");
+        System.out.println("=== PERMITALL PATTERN: /api/" + apiVersion + "/auth/** ===");
+    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
