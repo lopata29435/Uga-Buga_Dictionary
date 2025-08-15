@@ -126,17 +126,21 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        System.out.println("=== BUILDING SECURITY FILTER CHAIN ===");
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> {
+                    System.out.println("=== CONFIGURING REQUEST MATCHERS ===");
+                    System.out.println("=== PERMITALL: /api/" + apiVersion + "/auth/** ===");
+                    auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(String.format("/api/%s/auth/**", apiVersion)).permitAll()
                         .requestMatchers(WHITE_LIST_URL).permitAll()
                         .requestMatchers("/uga-buga_dictionary/**", "/favicon.ico", "/hammer.svg", "/profile.jpg", "/assets/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated();
+                })
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(jsonAuthenticationEntryPoint())
                         .accessDeniedHandler(jsonAccessDeniedHandler())

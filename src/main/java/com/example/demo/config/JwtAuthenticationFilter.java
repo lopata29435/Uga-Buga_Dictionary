@@ -43,10 +43,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+        String requestPath = request.getRequestURI();
+        String method = request.getMethod();
+        System.out.println("=== JWT FILTER: " + method + " " + requestPath + " ===");
+
         final String authHeader = request.getHeader("Authorization");
+        System.out.println("=== AUTH HEADER: " + authHeader + " ===");
+
         final String jwt;
         final String userEmail;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("=== NO AUTH HEADER OR NOT BEARER, CONTINUING FILTER CHAIN ===");
             filterChain.doFilter(request, response);
             return;
         }
@@ -70,8 +77,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (AuthExceptions.AccessTokenExpiredException e) {
+            System.out.println("=== ACCESS TOKEN EXPIRED ===");
             writeError(response, HttpServletResponse.SC_UNAUTHORIZED, "ACCESS_TOKEN_EXPIRED", e.getMessage());
         } catch (AuthExceptions.InvalidAccessTokenException e) {
+            System.out.println("=== INVALID ACCESS TOKEN ===");
             writeError(response, HttpServletResponse.SC_UNAUTHORIZED, "INVALID_ACCESS_TOKEN", e.getMessage());
         }
     }
