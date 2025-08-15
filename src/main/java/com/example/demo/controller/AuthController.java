@@ -27,7 +27,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping("/register")
+    @PostMapping("/MQAZHdFhKFOTZXugjyXL")
     @Operation(
         summary = "Регистрация нового пользователя",
         description = "Создает нового пользователя и возвращает JWT токены"
