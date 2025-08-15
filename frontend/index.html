@@ -2,39 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Новый набор favicon (версионирование для сброса кэша) -->
-    <link rel="icon" type="image/svg+xml" href="/hammer.svg?v=2" id="favicon-svg" />
-    <link rel="icon" type="image/png" href="/hammer.png?v=2" id="favicon-png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Заголовок вкладки -->
-    <title>Uga-Buga</title>
-    <script>
-      // На случай размещения в подпапке – подменяем favicon относительным к BASE_URL путём
-      (function() {
-        var base = (window.importMetaEnv && window.importMetaEnv.BASE_URL) || (window.__BASE_URL__ || '/');
-        // Попытка прочитать <base> если был задан
-        var baseTag = document.querySelector('base');
-        if (baseTag && baseTag.getAttribute('href')) {
-          base = baseTag.getAttribute('href');
-        }
-        function norm(p){
-          if(!base.endsWith('/') ) base += '/';
-          return base.replace(/\/+$/,'/') + p.replace(/^\//,'');
-        }
-        var svg = document.getElementById('favicon-svg');
-        var png = document.getElementById('favicon-png');
-        if (svg) svg.href = norm('hammer.svg?v=2');
-        if (png) png.href = norm('hammer.png?v=2');
-        // Принудительно обновляем иконку (некоторые браузеры кэшируют агрессивно)
-        var clone = svg && svg.cloneNode(true);
-        if(clone){
-          setTimeout(()=>{svg.parentNode.replaceChild(clone, svg);}, 50);
-        }
-      })();
+    <!-- Base динамически вставляется, если не root -->
+    <script type="module">
+      const base = import.meta.env.BASE_URL || '/';
+      if (!document.querySelector('base')) {
+        const b = document.createElement('base');
+        b.href = base;
+        document.head.prepend(b);
+      }
     </script>
+    <!-- Относительные favicon (работают в подпапке) -->
+    <link id="favicon-main" rel="icon" type="image/svg+xml" href="hammer.svg?v=3" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Uga-Buga</title>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="src/main.jsx"></script>
   </body>
 </html>
