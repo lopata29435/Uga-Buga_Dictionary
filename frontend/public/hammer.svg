@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <rect width="64" height="64" rx="12" fill="#3eb489"/>
+    <!-- Рукоять -->
+    <rect x="28" y="20" width="8" height="28" rx="2" fill="#8B5E3C"/>
+    <!-- Голова молотка -->
+    <rect x="18" y="12" width="28" height="12" rx="2" fill="#fff"/>
+    <!-- Кромка головы -->
+    <rect x="18" y="20" width="28" height="2" fill="#ccc"/>
+</svg>

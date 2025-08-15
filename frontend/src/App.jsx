@@ -10,9 +10,10 @@ import { AuthProvider } from './context/AuthContext';
 import './App.css';
 
 function App() {
+  const basePath = import.meta.env.VITE_BASE_PATH ? `/${import.meta.env.VITE_BASE_PATH.replace(/^\/+|\/+$/g,'')}` : '';
   return (
     <AuthProvider>
-      <Router>
+      <Router basename={basePath}>
         <div className="App">
           <Navigation />
           <Routes>
