@@ -137,7 +137,9 @@ public class SecurityConfig {
                     auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(String.format("/api/%s/auth/**", apiVersion)).permitAll()
-                        .requestMatchers(String.format("/%s/auth/**", apiVersion)).permitAll() // Добавлено для проксированных запросов
+                        .requestMatchers(String.format("/%s/auth/**", apiVersion)).permitAll()
+                        .requestMatchers(String.format("/api/%s/dictionary/**", apiVersion)).authenticated()
+                        .requestMatchers(String.format("/%s/dictionary/**", apiVersion)).authenticated()
                         .requestMatchers(WHITE_LIST_URL).permitAll()
                         .requestMatchers("/uga-buga_dictionary/**", "/favicon.ico", "/hammer.svg", "/profile.jpg", "/assets/**").permitAll()
                         .anyRequest().authenticated();

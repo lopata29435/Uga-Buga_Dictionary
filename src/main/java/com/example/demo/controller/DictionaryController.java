@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/${api.version}/dictionary")
+@RequestMapping({"/api/${api.version}/dictionary", "/${api.version}/dictionary"})
 @SecurityRequirement(name = "bearerAuth")
 public class DictionaryController {
 
@@ -61,7 +61,7 @@ public class DictionaryController {
     @GetMapping("/words/{id}")
     @Operation(
         summary = "Получить слово по ID",
-        description = "Возвращает слово по его ID"
+        description = "Во��вращает слово по его ID"
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Слово найдено"),

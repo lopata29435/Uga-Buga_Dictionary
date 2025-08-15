@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ProfileSection from '../components/ProfileSection';
 import { useAuth } from '../context/useAuth';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import config from '../config/api.js';
 
@@ -122,8 +123,8 @@ const Search = () => {
                   <p style={{ marginBottom: '2rem' }}>
                     Попробуйте изменить поисковый запрос или добавьте это слово в словарь
                   </p>
-                  <a
-                    href="/add-word"
+                  <Link
+                    to="/add-word"
                     className="btn"
                     style={{
                       textDecoration: 'none',
@@ -133,7 +134,7 @@ const Search = () => {
                     }}
                   >
                     Добавить слово "{query}"
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>
