@@ -10,8 +10,8 @@ import { AuthProvider } from './context/AuthContext';
 import './App.css';
 
 function App() {
-  const basePath = import.meta.env.VITE_BASE_PATH ? `/${import.meta.env.VITE_BASE_PATH.replace(/^\/+|\/+$/g,'')}` : '';
-  // Диагностика (можно удалить позже)
+  // Вариант B: жёстко задаём basename
+  const basePath = '/uga-buga_dictionary';
   console.log('Router basename =', basePath);
   return (
     <AuthProvider>

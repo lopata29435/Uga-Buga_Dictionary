@@ -16,7 +16,21 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import jakarta.annotation.PostConstruct;
+
+import java.io.IOException;
 import java.util.Arrays;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import java.time.Instant;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -49,19 +63,59 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000", "https://lopata.su"));
-
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-
+         configuration.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "http://127.0.0.1:*",
+                "http://localhost",
+                "https://lopata.su",
+                "https://www.lopata.su"
+        ));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "Cache-Control"));
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
-
+        configuration.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-
         return source;
+    }
+
+    @Bean
+    public AuthenticationEntryPoint jsonAuthenticationEntryPoint() {
+        return new AuthenticationEntryPoint() {
+            private final ObjectMapper mapper = new ObjectMapper();
+            @Override
+            public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                mapper.writeValue(response.getOutputStream(), java.util.Map.of(
+                        "timestamp", Instant.now().toString(),
+                        "status", 401,
+                        "error", "UNAUTHORIZED",
+                        "message", authException.getMessage(),
+                        "path", request.getRequestURI()
+                ));
+            }
+        };
+    }
+
+    @Bean
+    public AccessDeniedHandler jsonAccessDeniedHandler() {
+        return new AccessDeniedHandler() {
+            private final ObjectMapper mapper = new ObjectMapper();
+            @Override
+            public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setContentType("application/json");
+                mapper.writeValue(response.getOutputStream(), java.util.Map.of(
+                        "timestamp", Instant.now().toString(),
+                        "status", 403,
+                        "error", "FORBIDDEN",
+                        "message", accessDeniedException.getMessage(),
+                        "path", request.getRequestURI()
+                ));
+            }
+        };
     }
 
     @Bean
@@ -71,13 +125,18 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(String.format("/api/%s/auth/**", apiVersion)).permitAll()
                         .requestMatchers(WHITE_LIST_URL).permitAll()
+                        .requestMatchers("/uga-buga_dictionary/**", "/favicon.ico", "/hammer.svg", "/profile.jpg", "/assets/**").permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jsonAuthenticationEntryPoint())
+                        .accessDeniedHandler(jsonAccessDeniedHandler())
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 }
