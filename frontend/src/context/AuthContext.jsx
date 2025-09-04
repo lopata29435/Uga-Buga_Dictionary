@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const requestInterceptor = axios.interceptors.request.use(
-      (reqConfig) => { // переименовали во избежание тени переменной config
+      (reqConfig) => {
         // Не добавляем Authorization заголовок для запросов на обновление токена
         if (reqConfig.url?.includes('/auth/refresh')) {
           return reqConfig;
@@ -109,9 +109,9 @@ export const AuthProvider = ({ children }) => {
             });
 
             const newAccessToken = response.data.accessToken;
-            const newRefreshToken = response.data.refreshToken; // На случай если сервер возвращает новый refresh token
+            const newRefreshToken = response.data.refreshToken;
 
-            // ВАЖНО: Обновляем состояние React через setState, а не только localStorage
+            // КРИТИЧЕСКИ ВАЖНО: Обновляем состояние React СИНХРОННО
             setAccessToken(newAccessToken);
             localStorage.setItem('accessToken', newAccessToken);
 
@@ -121,7 +121,7 @@ export const AuthProvider = ({ children }) => {
               localStorage.setItem('refreshToken', newRefreshToken);
             }
 
-            // Обновляем пользователя в состоянии (важно для isAuthenticated)
+            // Обновляем пользователя в состоянии - ПРИНУДИТЕЛЬНО
             const storedUsername = localStorage.getItem('username');
             if (storedUsername) {
               setUser({ username: storedUsername, authenticated: true });
@@ -133,7 +133,12 @@ export const AuthProvider = ({ children }) => {
             // Обрабатываем очередь ожидающих запросов
             processQueue(null, newAccessToken);
 
-            console.log('Token refreshed successfully');
+            console.log('Token refreshed successfully, user should remain authenticated');
+
+            // Принудительно вызываем setState чтобы компоненты обновились
+            setLoading(false);
+            setLoading(true);
+            setLoading(false);
 
             // Повторяем оригинальный запрос
             return axios(originalRequest);

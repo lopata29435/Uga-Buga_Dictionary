@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './useAuthHook';
 
@@ -6,11 +6,19 @@ import { useAuth } from './useAuthHook';
 export const useAuthRedirect = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
+  const wasAuthenticated = useRef(false);
 
   useEffect(() => {
-    // Если пользователь был авторизован, но токены были очищены (logout)
-    // и мы не на главной или публичных страницах - перенаправляем на главную
-    if (!isAuthenticated && !user) {
+    // Запоминаем первоначальное состояние авторизации
+    if (isAuthenticated && user) {
+      wasAuthenticated.current = true;
+    }
+  }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    // Перенаправляем только если пользователь БЫЛ авторизован, но стал неавторизованным
+    // Это означает что произошел logout (автоматический или ручной)
+    if (wasAuthenticated.current && !isAuthenticated && !user) {
       const currentPath = window.location.pathname;
       const publicPaths = ['/', '/login', '/public-dictionary'];
 
@@ -18,6 +26,7 @@ export const useAuthRedirect = () => {
       if (!publicPaths.includes(currentPath)) {
         console.log('Session expired, redirecting to home page...');
         navigate('/', { replace: true });
+        wasAuthenticated.current = false; // Сбрасываем флаг
       }
     }
   }, [isAuthenticated, user, navigate]);
