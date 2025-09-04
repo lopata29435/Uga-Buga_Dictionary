@@ -7,7 +7,7 @@ const Navigation = () => {
   const { isAuthenticated, logout, user } = useAuth();
 
   const handleLogout = () => {
-    logout(false); // false означает что не нужно автоматически перенаправлять
+    logout(); // Убираем параметр, так как навигация теперь обрабатывается через useAuthRedirect
   };
 
   return (

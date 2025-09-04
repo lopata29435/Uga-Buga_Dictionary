@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import ProfileSection from '../components/ProfileSection';
 import { useAuth } from '../context/useAuthHook';
+import { useAuthRedirect } from '../context/useAuthRedirect';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import config from '../config/api.js';
 
 const Search = () => {
   const { isAuthenticated } = useAuth();
+  useAuthRedirect(); // Автоматическое перенаправление при logout
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);

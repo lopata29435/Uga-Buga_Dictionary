@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import ProfileSection from '../components/ProfileSection';
 import { useAuth } from '../context/useAuthHook';
+import { useAuthRedirect } from '../context/useAuthRedirect';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import config from '../config/api.js';
 
 const AddWord = () => {
   const { isAuthenticated } = useAuth();
+  useAuthRedirect(); // Автоматическое перенаправление при logout
   const navigate = useNavigate();
   const location = useLocation();
   const [formData, setFormData] = useState({

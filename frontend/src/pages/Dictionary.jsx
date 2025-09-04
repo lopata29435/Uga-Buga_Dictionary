@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import ProfileSection from '../components/ProfileSection';
 import { useAuth } from '../context/useAuthHook';
+import { useAuthRedirect } from '../context/useAuthRedirect';
 import axios from 'axios';
 import config from '../config/api.js';
 
 const Dictionary = () => {
   const { isAuthenticated, loading: authLoading } = useAuth();
+  useAuthRedirect(); // Автоматическое перенаправление при logout
   const [words, setWords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

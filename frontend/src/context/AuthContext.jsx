@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import config from '../config/api.js';
 import { AuthContext } from './AuthContextBase';
@@ -9,7 +8,6 @@ export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   // Инициализация токенов из localStorage
   useEffect(() => {
@@ -26,8 +24,8 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // logout вынесен вверх и мемоизирован, чтобы можно было безопасно добавить в зависимости
-  const logout = useCallback(async (redirectToHome = true) => {
+  // logout без навигации - навигация будет обрабатываться в компонентах
+  const logout = useCallback(async () => {
     try {
       if (refreshToken) {
         await axios.post(`${config.API_URL}${config.endpoints.auth.logout}`, { refreshToken });
@@ -41,14 +39,8 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('username');
-
-      // Автоматическое перенаправление на главную страницу
-      if (redirectToHome) {
-        console.log('Redirecting to home page due to expired session...');
-        navigate('/', { replace: true });
-      }
     }
-  }, [refreshToken, navigate]);
+  }, [refreshToken]);
 
   // Настройка axios interceptor для автоматического добавления токена
   useEffect(() => {
@@ -152,10 +144,10 @@ export const AuthProvider = ({ children }) => {
             // Обрабатываем очередь с ошибкой
             processQueue(refreshError, null);
 
-            // Выполняем logout с перенаправлением если refresh token действительно недействителен
+            // Выполняем logout если refresh token действительно недействителен
             if (refreshError.response?.status === 401) {
-              console.log('Refresh token expired, logging out and redirecting to home...');
-              await logout(true); // true означает перенаправление на главную
+              console.log('Refresh token expired, logging out...');
+              await logout();
             }
 
             return Promise.reject(refreshError);
