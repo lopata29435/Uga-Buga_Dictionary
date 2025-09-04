@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Navigation from './components/Navigation';
 import Home from './pages/Home';
 import Dictionary from './pages/Dictionary';
+import PublicDictionary from './pages/PublicDictionary';
 import AddWord from './pages/AddWord';
 import Search from './pages/Search';
 import Login from './pages/Login';
@@ -20,6 +21,7 @@ function App() {
           <Navigation />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/public-dictionary" element={<PublicDictionary />} />
             <Route path="/dictionary" element={<Dictionary />} />
             <Route path="/add-word" element={<AddWord />} />
             <Route path="/search" element={<Search />} />

@@ -527,6 +527,68 @@ body {
   animation: spin 1s linear infinite;
 }
 
+/* Публичная страница словаря */
+.words-stats {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(62, 180, 137, 0.2);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #3eb489;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+.word-card.public {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(62, 180, 137, 0.1);
+}
+
+.word-card.public:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(62, 180, 137, 0.15);
+  border-color: rgba(62, 180, 137, 0.3);
+}
+
+.view-hint, .login-hint {
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.login-hint {
+  color: #dc2626;
+}
+
+.word-actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(107, 114, 128, 0.1);
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
   .nav-container {

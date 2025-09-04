@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProfileSection from '../components/ProfileSection';
 import { useAuth } from '../context/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import config from '../config/api.js';
 
 const AddWord = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     word: '',
     translation: '',
@@ -16,6 +17,16 @@ const AddWord = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Заполняем начальное значение слова из состояния навигации
+  useEffect(() => {
+    if (location.state?.initialWord) {
+      setFormData(prev => ({
+        ...prev,
+        word: location.state.initialWord
+      }));
+    }
+  }, [location.state]);
 
   const handleChange = (e) => {
     setFormData({

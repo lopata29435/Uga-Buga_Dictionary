@@ -138,6 +138,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(String.format("/api/%s/auth/**", apiVersion)).permitAll()
                         .requestMatchers(String.format("/%s/auth/**", apiVersion)).permitAll()
+                        .requestMatchers(HttpMethod.GET, String.format("/api/%s/dictionary/words", apiVersion)).permitAll()
+                        .requestMatchers(HttpMethod.GET, String.format("/%s/dictionary/words", apiVersion)).permitAll()
                         .requestMatchers(String.format("/api/%s/dictionary/**", apiVersion)).authenticated()
                         .requestMatchers(String.format("/%s/dictionary/**", apiVersion)).authenticated()
                         .requestMatchers(WHITE_LIST_URL).permitAll()

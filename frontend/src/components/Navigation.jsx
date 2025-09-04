@@ -25,6 +25,14 @@ const Navigation = () => {
               Главная
             </Link>
           </li>
+          <li>
+            <Link
+              to="/public-dictionary"
+              className={location.pathname === '/public-dictionary' ? 'active' : ''}
+            >
+              Все слова
+            </Link>
+          </li>
           {isAuthenticated && (
             <>
               <li>
@@ -32,7 +40,7 @@ const Navigation = () => {
                   to="/dictionary"
                   className={location.pathname === '/dictionary' ? 'active' : ''}
                 >
-                  Словарь
+                  Мой словарь
                 </Link>
               </li>
               <li>

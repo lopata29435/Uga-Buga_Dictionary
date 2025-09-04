@@ -132,6 +132,7 @@ const Search = () => {
                       width: 'auto',
                       padding: '0.8rem 2rem'
                     }}
+                    state={{ initialWord: query }}
                   >
                     Добавить слово "{query}"
                   </Link>
