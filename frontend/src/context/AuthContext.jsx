@@ -44,8 +44,28 @@ export const AuthProvider = ({ children }) => {
 
   // Настройка axios interceptor для автоматического добавления токена
   useEffect(() => {
+    let isRefreshing = false; // Флаг для предотвращения множественных попыток обновления
+    let failedQueue = []; // Очередь неудачных запросов
+
+    const processQueue = (error, token = null) => {
+      failedQueue.forEach(({ resolve, reject }) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(token);
+        }
+      });
+
+      failedQueue = [];
+    };
+
     const requestInterceptor = axios.interceptors.request.use(
       (reqConfig) => { // переименовали во избежание тени переменной config
+        // Не добавляем Authorization заголовок для запросов на обновление токена
+        if (reqConfig.url?.includes('/auth/refresh')) {
+          return reqConfig;
+        }
+
         const token = accessToken || localStorage.getItem('accessToken');
         if (token) {
           reqConfig.headers.Authorization = `Bearer ${token}`;
@@ -58,19 +78,77 @@ export const AuthProvider = ({ children }) => {
     const responseInterceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
-        if (error.response?.status === 401 && refreshToken) {
+        const originalRequest = error.config;
+
+        // Проверяем, что это 401 ошибка, есть refresh token, и это не запрос на обновление токена
+        if (error.response?.status === 401 &&
+            refreshToken &&
+            !originalRequest._retry &&
+            !originalRequest.url?.includes('/auth/refresh')) {
+
+          if (isRefreshing) {
+            // Если уже идет процесс обновления, добавляем запрос в очередь
+            return new Promise((resolve, reject) => {
+              failedQueue.push({ resolve, reject });
+            }).then(token => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              return axios(originalRequest);
+            }).catch(err => {
+              return Promise.reject(err);
+            });
+          }
+
+          originalRequest._retry = true;
+          isRefreshing = true;
+
           try {
-            const response = await axios.post(`${config.API_URL}${config.endpoints.auth.refresh}`, { refreshToken });
+            console.log('Attempting to refresh token...');
+            // Создаем отдельный запрос без interceptor'ов для обновления токена
+            const response = await axios.create().post(`${config.API_URL}${config.endpoints.auth.refresh}`, {
+              refreshToken
+            });
+
             const newAccessToken = response.data.accessToken;
+            const newRefreshToken = response.data.refreshToken; // На случай если сервер возвращает новый refresh token
+
             setAccessToken(newAccessToken);
             localStorage.setItem('accessToken', newAccessToken);
-            error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-            return axios.request(error.config);
+
+            // Обновляем refresh token если сервер вернул новый
+            if (newRefreshToken) {
+              setRefreshToken(newRefreshToken);
+              localStorage.setItem('refreshToken', newRefreshToken);
+            }
+
+            // Обновляем заголовок в оригинальном запросе
+            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+            // Обрабатываем очередь ожидающих запросов
+            processQueue(null, newAccessToken);
+
+            console.log('Token refreshed successfully');
+
+            // Повторяем оригинальный запрос
+            return axios(originalRequest);
+
           } catch (refreshError) {
-            await logout();
+            console.error('Token refresh failed:', refreshError);
+
+            // Обрабатываем очередь с ошибкой
+            processQueue(refreshError, null);
+
+            // Выполняем logout только если refresh token действительно недействителен
+            if (refreshError.response?.status === 401) {
+              console.log('Refresh token expired, logging out...');
+              await logout();
+            }
+
             return Promise.reject(refreshError);
+          } finally {
+            isRefreshing = false;
           }
         }
+
         return Promise.reject(error);
       }
     );
