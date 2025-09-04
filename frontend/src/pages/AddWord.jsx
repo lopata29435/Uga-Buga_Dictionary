@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ProfileSection from '../components/ProfileSection';
-import { useAuth } from '../context/useAuth';
+import { useAuth } from '../context/useAuthHook';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import config from '../config/api.js';

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import ProfileSection from '../components/ProfileSection';
-import { useAuth } from '../context/useAuth';
-import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/useAuthHook';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import config from '../config/api.js';
 
 const Register = () => {
   const { register, isAuthenticated } = useAuth();

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ProfileSection from '../components/ProfileSection';
-import { useAuth } from '../context/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/useAuthHook';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const { login, isAuthenticated } = useAuth();

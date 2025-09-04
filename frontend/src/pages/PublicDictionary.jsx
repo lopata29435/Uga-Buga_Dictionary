@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import config from '../config/api';
-import { useAuth } from '../context/useAuth';
+import { useAuth } from '../context/useAuthHook';
 
 const PublicDictionary = () => {
   const [words, setWords] = useState([]);
