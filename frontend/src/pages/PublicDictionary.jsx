@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../config/api';
+import config from '../config/api';
 import { useAuth } from '../context/useAuth';
 
 const PublicDictionary = () => {
@@ -20,7 +20,7 @@ const PublicDictionary = () => {
       setError(null);
 
       // Публичный запрос без токена авторизации
-      const response = await fetch(`${API_BASE_URL}/dictionary/words`, {
+      const response = await fetch(`${config.API_URL}/dictionary/words`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
